@@ -3,10 +3,11 @@
 Game::Game()
 {
   tank.setupTank(
-    "../assets/Ace Of Tanks Assets/Player/Player_3_body_1.png",
-    "../assets/Ace Of Tanks Assets/Player/Player_3_body_2.png",
-    "../assets/Ace Of Tanks Assets/Player/Player_3_turret.png");
+    "assets/Ace Of Tanks Assets/Player/Player_3_body_1.png",
+    "assets/Ace Of Tanks Assets/Player/Player_3_body_2.png",
+    "assets/Ace Of Tanks Assets/Player/player_3_turret.png");
 } 
+
 Game::~Game()
 {
 }

@@ -11,9 +11,9 @@ FetchContent_Declare(SFML
     EXCLUDE_FROM_ALL
     SYSTEM)
 FetchContent_MakeAvailable(SFML)
-
 add_executable(main src/main.cpp "src/Objects/Vehicles/Tank.h" "src/Objects/Vehicles/Tank.cpp" "src/Objects/GameObject.h" "src/Objects/GameObject.cpp" "src/Game.h" "src/Game.cpp")
 target_compile_features(main PRIVATE cxx_std_17)
 target_link_libraries(main PRIVATE SFML::Graphics SFML::Audio)
+
 
 set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT main)

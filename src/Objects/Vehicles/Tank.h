@@ -15,4 +15,7 @@ class Tank
   GameObject tank_body_1;
   GameObject tank_body_2;
   GameObject tank_turret;
+  float scale = 2;
+  float turret_rotation = 0;
+  float tank_rotation   = 0;
 };
