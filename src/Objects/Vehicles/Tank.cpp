@@ -22,35 +22,24 @@ void Tank::setupTank(std::string filename_1, std::string filename_2, std::string
   tank_turret.getSprite()->setOrigin(
     { tank_turret.getSprite()->getGlobalBounds().size.x/2, point});
   tank_turret.getSprite()->setScale({ scale, scale });
-  //tank_turret.setVisible(false);
+
+
+  //-------------------------------------------
 }
 
 void Tank::drawTank(sf::RenderWindow& window) 
 {
+  window.draw(bullets.getSprite());
   if (tank_body_1.getVisible())
   {
-    tank_body_1.setPosition(position.x, position.y);
     tank_body_1.getSprite()->setRotation(sf::degrees(tank_rotation));
     window.draw(*tank_body_1.getSprite());
+    position = tank_body_1.getSprite()->getPosition();
 
-    tank_rotation -= 0.01;
-
-    {
-      sf::Sprite* bodySprite     = tank_body_1.getSprite();
-      sf::Vector2f bodyOriginPos = bodySprite->getPosition();
-      const float bodyDotRadius  = 3.0f;
-      sf::CircleShape bodyDot(bodyDotRadius);
-      bodyDot.setFillColor(sf::Color::Blue);
-      bodyDot.setOrigin({ bodyDotRadius, bodyDotRadius }); // center the circle
-                                                           // on the origin
-                                                           // point
-      bodyDot.setPosition(bodyOriginPos);
-      window.draw(bodyDot);
-    }
+    
   }
   if (tank_body_2.getVisible())
   {
-    tank_body_2.setPosition(position.x, position.y);
     window.draw(*tank_body_2.getSprite());
   }
   if (tank_turret.getVisible())
@@ -59,41 +48,91 @@ void Tank::drawTank(sf::RenderWindow& window)
       position.x ,
       position.y );
     tank_turret.getSprite()->setRotation(sf::degrees(turret_rotation));
-    
-    turret_rotation += 0.01;
-    
     window.draw(*tank_turret.getSprite());
 
-    {
-      sf::Sprite* turretSprite    = tank_turret.getSprite();
-      sf::Vector2f originWorldPos = turretSprite->getPosition();
-      const float dotRadius       = 3.0f;
-      sf::CircleShape dot(dotRadius);
-      dot.setFillColor(sf::Color::Red);
-      dot.setOrigin({ dotRadius, dotRadius }); // center the circle on the
-                                               // origin point
-      dot.setPosition(originWorldPos);
-      window.draw(dot);
-    }
   }
 }
 
-void Tank::moveTank(sf::Vector2i movement) 
+void Tank::tankControl(sf::Vector2i movement_y, sf::Vector2i movement_x,float dt)
 {
-  if (movement.x > 0)
+  if (movement_x.x != 0)
   {
-    position.x += 10;
+    tank_rotation += tank_rotation_speed * dt;
   }
-  else if (movement.x < 0)
+  if (movement_x.y != 0)
   {
-    position.x -= 10;
+    tank_rotation -= tank_rotation_speed * dt;
   }
-  if (movement.y > 0)
+  if (movement_y.y != 0)
   {
-    position.y += 10;
+    moveTank(1,dt);
   }
-  else if (movement.y < 0)
+  if (movement_y.x != 0)
   {
-    position.y -= 10;
+    moveTank(-1,dt);
   }
 }
+
+float Tank::lookAt(sf::Vector2f from, sf::Vector2f to)
+{
+  sf::Vector2f direction = to - from;
+
+  return std::atan2(direction.y, direction.x) * 180.f / 3.14159265358979323846f;
+}
+
+void Tank::moveTank(int direction, float dt) 
+{
+  float x = cos((tank_rotation-90.f) * 3.14159265358979323846f / 180.f);
+  float y = sin((tank_rotation-90.f) * 3.14159265358979323846f / 180.f);
+
+  tank_body_1.getSprite()->move({ ((x * tank_speed)*direction)*dt, ((y * tank_speed)*direction)*dt });
+  position = tank_body_1.getSprite()->getPosition();
+}
+
+void Tank::updateTank(float dt, sf::RenderWindow& window)
+{
+  bullets.move(dt);
+  sf::Vector2f mouse_location =
+    static_cast<sf::Vector2f>(sf::Mouse::getPosition(window));
+  float desired_angle =
+    lookAt(tank_turret.getSprite()->getPosition(), mouse_location) + 90;
+  float turn_amount_left = std::remainder(turret_rotation - desired_angle, 360);
+
+  if (turn_amount_left > 180)
+  {
+    turn_amount_left = turn_amount_left - 360;
+  }
+  if (turn_amount_left < -180)
+  {
+    turn_amount_left = turn_amount_left + 360;
+  }
+
+  if (turn_amount_left < 0)
+  {
+    turret_rotation += turret_rotation_speed*dt;
+  }
+  else
+  {
+    turret_rotation -= turret_rotation_speed*dt;
+  }
+
+}
+
+void Tank::setPos(sf::Vector2f loc) 
+{
+  tank_body_1.setPosition(loc.x, loc.y);
+}
+
+sf::Vector2f Tank::getMuzzlePosition()
+{
+  return tank_turret.getSprite()->getTransform().transformPoint(muzzle_offset);
+}
+
+void Tank::fireGun() 
+{
+  bullets.setLocation(static_cast<sf::Vector2i>(getMuzzlePosition()));
+  bullets.fire(turret_rotation);
+
+}
+
+
