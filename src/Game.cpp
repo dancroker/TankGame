@@ -3,9 +3,9 @@
 Game::Game()
 {
   tank.setupTank(
-    "assets/Ace Of Tanks Assets/Player/Player_3_body_1.png",
-    "assets/Ace Of Tanks Assets/Player/Player_3_body_2.png",
-    "assets/Ace Of Tanks Assets/Player/player_3_turret.png");
+    "assets/Ace Of Tanks Assets/Player/Player_1_body_1.png",
+    "assets/Ace Of Tanks Assets/Player/Player_1_body_2.png",
+    "assets/Ace Of Tanks Assets/Player/player_1_turret.png");
   tank.setPos({ 200, 200 });
 } 
 
@@ -15,13 +15,37 @@ Game::~Game()
 
 void Game::render(sf::RenderWindow& window) 
 {
+  map.drawMap(window);
   tank.drawTank(window);
 }
 
 void Game::update(float dt, sf::RenderWindow& window)
 {
-  tank.tankControl(movement_y,movement_x,dt);
+  sf::Vector2f prev_pos = tank.getBodySprite().getPosition();
+  float prev_rot        = tank.getTankRotation();
+  tank.rotateTank(movement_x, dt);
   tank.updateTank(dt, window);
+  int collision = map.isTankColliding(tank.getTankMarkers());
+  sf::Vector2i true_movement = movement_y;
+  if (collision != -1)
+  {
+    tank.setTankRotation(prev_rot);
+    switch (collision+1)
+    {
+      case 1:
+      case 2:
+        true_movement.y = 0;
+        break;
+      case 3:
+      case 4:
+        true_movement.x = 0;
+        break;
+    
+    }
+    tank.setPos(prev_pos);
+    
+  }
+  tank.tankControl(true_movement, dt);
 }
 
 void Game::keyPressed(const sf::Event::KeyPressed& key)

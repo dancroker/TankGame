@@ -30,14 +30,15 @@ void Tank::setupTank(std::string filename_1, std::string filename_2, std::string
 void Tank::drawTank(sf::RenderWindow& window) 
 {
   window.draw(bullets.getSprite());
+
+  // Draw body 1 and marker attached to it
   if (tank_body_1.getVisible())
   {
     tank_body_1.getSprite()->setRotation(sf::degrees(tank_rotation));
     window.draw(*tank_body_1.getSprite());
     position = tank_body_1.getSprite()->getPosition();
-
-    
   }
+
   if (tank_body_2.getVisible())
   {
     window.draw(*tank_body_2.getSprite());
@@ -51,18 +52,11 @@ void Tank::drawTank(sf::RenderWindow& window)
     window.draw(*tank_turret.getSprite());
 
   }
+  drawTankMarkers(window);
 }
 
-void Tank::tankControl(sf::Vector2i movement_y, sf::Vector2i movement_x,float dt)
+void Tank::tankControl(sf::Vector2i movement_y, float dt)
 {
-  if (movement_x.x != 0)
-  {
-    tank_rotation += tank_rotation_speed * dt;
-  }
-  if (movement_x.y != 0)
-  {
-    tank_rotation -= tank_rotation_speed * dt;
-  }
   if (movement_y.y != 0)
   {
     moveTank(1,dt);
@@ -89,6 +83,19 @@ void Tank::moveTank(int direction, float dt)
   position = tank_body_1.getSprite()->getPosition();
 }
 
+void Tank::rotateTank(sf::Vector2i movement_x, float dt) 
+{
+  if (movement_x.x != 0)
+  {
+    tank_rotation += tank_rotation_speed * dt;
+  }
+  if (movement_x.y != 0)
+  {
+    tank_rotation -= tank_rotation_speed * dt;
+  }
+  tank_body_1.getSprite()->setRotation(sf::degrees(tank_rotation));
+}
+
 void Tank::updateTank(float dt, sf::RenderWindow& window)
 {
   bullets.move(dt);
@@ -109,11 +116,11 @@ void Tank::updateTank(float dt, sf::RenderWindow& window)
 
   if (turn_amount_left < 0)
   {
-    turret_rotation += turret_rotation_speed*dt;
+    turret_rotation += (turret_rotation_speed*dt);
   }
   else
   {
-    turret_rotation -= turret_rotation_speed*dt;
+    turret_rotation -= (turret_rotation_speed*dt);
   }
 
 }
@@ -126,6 +133,75 @@ void Tank::setPos(sf::Vector2f loc)
 sf::Vector2f Tank::getMuzzlePosition()
 {
   return tank_turret.getSprite()->getTransform().transformPoint(muzzle_offset);
+}
+
+void Tank::drawTankMarkers(sf::RenderWindow& window)
+{
+  // Configurable marker parameters (edit these values to customize marker local
+  // position / appearance)
+  sf::Vector2f marker_local_offset = { 3.f, 2.f }; // local coordinates relative
+                                                   // to the tank body sprite
+                                                   // origin
+
+  static sf::Color marker_color = sf::Color(255, 0, 0, 200); // semi-transparent
+                                                             // red
+
+  // Compute marker world position using the sprite transform so rotation, scale
+  // and origin are accounted for
+
+  // Draw marker (centered)
+  sf::CircleShape marker(2.0f);
+  marker.setOrigin({ 2, 2 });
+  marker.setFillColor(marker_color);
+
+  // Top Left
+  {
+    sf::Vector2f marker_local_offset = { 3.f, 2.f };
+    sf::Sprite* bodySprite           = tank_body_1.getSprite();
+    sf::Vector2f markerWorldPos =
+      bodySprite->getTransform().transformPoint(marker_local_offset);
+    marker.setPosition(markerWorldPos);
+    window.draw(marker);
+    std::cout << marker.getPosition().x << " , " << marker.getPosition().y << std::endl;
+  }
+  {
+    // Top Left
+    sf::Vector2f marker_local_offset = { 30.5f, 2.f };
+    sf::Sprite* bodySprite           = tank_body_1.getSprite();
+    sf::Vector2f markerWorldPos =
+      bodySprite->getTransform().transformPoint(marker_local_offset);
+    marker.setPosition(markerWorldPos);
+    window.draw(marker);
+  }
+  {
+    // Bottom Left
+    sf::Vector2f marker_local_offset = { 3.f, 45.f };
+    sf::Sprite* bodySprite           = tank_body_1.getSprite();
+    sf::Vector2f markerWorldPos =
+      bodySprite->getTransform().transformPoint(marker_local_offset);
+    marker.setPosition(markerWorldPos);
+    window.draw(marker);
+  }
+  {
+    // Bottom Right
+    sf::Vector2f marker_local_offset = { 30.5f, 45.f };
+    sf::Sprite* bodySprite           = tank_body_1.getSprite();
+    sf::Vector2f markerWorldPos =
+      bodySprite->getTransform().transformPoint(marker_local_offset);
+    marker.setPosition(markerWorldPos);
+    window.draw(marker);
+  }
+}
+
+sf::Vector2f* Tank::getTankMarkers()
+{
+  static sf::Vector2f tank_markers[4];
+  // Example marker positions (replace with actual logic as needed)
+  tank_markers[0] = tank_body_1.getSprite()->getTransform().transformPoint({ 3.f, 2.f });
+  tank_markers[1] = tank_body_1.getSprite()->getTransform().transformPoint({ 30.5f, 2.f });
+  tank_markers[2] = tank_body_1.getSprite()->getTransform().transformPoint({ 3.f, 45.f });
+  tank_markers[3] = tank_body_1.getSprite()->getTransform().transformPoint({ 30.5f, 45.f });
+  return tank_markers;
 }
 
 void Tank::fireGun() 
