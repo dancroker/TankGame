@@ -3,10 +3,16 @@
 Game::Game()
 {
   tank.setupTank(
-    "assets/Ace Of Tanks Assets/Player/Player_1_body_1.png",
-    "assets/Ace Of Tanks Assets/Player/Player_1_body_2.png",
-    "assets/Ace Of Tanks Assets/Player/player_1_turret.png");
+    "assets/Ace Of Tanks Assets/Player/Player_5_body_1.png",
+    "assets/Ace Of Tanks Assets/Player/Player_5_body_2.png",
+    "assets/Ace Of Tanks Assets/Player/player_5_turret.png");
   tank.setPos({ 200, 200 });
+  tankt.setupTank(
+    "assets/Ace Of Tanks Assets/Enemies/enemy_4_body_1.png",
+    "assets/Ace Of Tanks Assets/Enemies/enemy_4_body_2.png",
+    "assets/Ace Of Tanks Assets/Enemies/enemy_4_turret.png");
+  tankt.setPos({ 400, 400 });
+  //1-8 player assets
 } 
 
 Game::~Game()
@@ -16,7 +22,9 @@ Game::~Game()
 void Game::render(sf::RenderWindow& window) 
 {
   map.drawMap(window);
+  tankt.drawTank(window);
   tank.drawTank(window);
+  
 }
 
 void Game::update(float dt, sf::RenderWindow& window)
@@ -24,8 +32,17 @@ void Game::update(float dt, sf::RenderWindow& window)
   sf::Vector2f prev_pos = tank.getBodySprite().getPosition();
   float prev_rot        = tank.getTankRotation();
   tank.rotateTank(movement_x, dt);
-  tank.updateTank(dt, window);
+  tank.updateTank(dt, window, static_cast<sf::Vector2f>(sf::Mouse::getPosition(window)));
+  tankt.updateTank(dt, window, tank.getBodySprite().getPosition());
   int collision = map.isTankColliding(tank.getTankMarkers());
+
+  if (tankt.bulletCollision(tankt.getTankMarkers(), tank.getBullets().getLocation()))
+  {
+    std::cout << "HIT!!!!";
+    tankt.death();
+    tank.getBullets().remove();
+  }
+
   sf::Vector2i true_movement = movement_y;
   if (collision != -1)
   {

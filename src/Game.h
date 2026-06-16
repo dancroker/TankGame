@@ -15,6 +15,7 @@ class Game
  private:
   Tank tank;
   Map map;
+  Tank tankt;
   sf::Vector2i movement_y = { 0, 0 };
   sf::Vector2i movement_x = { 0, 0 };
 };

@@ -27,32 +27,34 @@ void Tank::setupTank(std::string filename_1, std::string filename_2, std::string
   //-------------------------------------------
 }
 
-void Tank::drawTank(sf::RenderWindow& window) 
+void Tank::drawTank(sf::RenderWindow& window)
 {
+  if (bullets.gethasFired())
+  {
   window.draw(bullets.getSprite());
-
-  // Draw body 1 and marker attached to it
-  if (tank_body_1.getVisible())
-  {
-    tank_body_1.getSprite()->setRotation(sf::degrees(tank_rotation));
-    window.draw(*tank_body_1.getSprite());
-    position = tank_body_1.getSprite()->getPosition();
   }
-
-  if (tank_body_2.getVisible())
+  if (is_alive)
   {
-    window.draw(*tank_body_2.getSprite());
-  }
-  if (tank_turret.getVisible())
-  {
-    tank_turret.setPosition(
-      position.x ,
-      position.y );
-    tank_turret.getSprite()->setRotation(sf::degrees(turret_rotation));
-    window.draw(*tank_turret.getSprite());
+    // Draw body 1 and marker attached to it
+    if (tank_body_1.getVisible())
+    {
+      tank_body_1.getSprite()->setRotation(sf::degrees(tank_rotation));
+      window.draw(*tank_body_1.getSprite());
+      position = tank_body_1.getSprite()->getPosition();
+    }
 
+    if (tank_body_2.getVisible())
+    {
+      window.draw(*tank_body_2.getSprite());
+    }
+    if (tank_turret.getVisible())
+    {
+      tank_turret.setPosition(position.x, position.y);
+      tank_turret.getSprite()->setRotation(sf::degrees(turret_rotation));
+      window.draw(*tank_turret.getSprite());
+    }
+    drawTankMarkers(window);
   }
-  drawTankMarkers(window);
 }
 
 void Tank::tankControl(sf::Vector2i movement_y, float dt)
@@ -72,6 +74,32 @@ float Tank::lookAt(sf::Vector2f from, sf::Vector2f to)
   sf::Vector2f direction = to - from;
 
   return std::atan2(direction.y, direction.x) * 180.f / 3.14159265358979323846f;
+}
+
+float dot(sf::Vector2f a, sf::Vector2f b)
+{
+  return a.x * b.x + a.y * b.y;
+}
+
+bool Tank::bulletCollision(sf::Vector2f tank_coords[4], sf::Vector2f bullet_coords) 
+{
+  if (is_alive)
+  {
+    // COMMENT how this works!!!
+    sf::Vector2f AB = tank_coords[1] - tank_coords[0];
+    sf::Vector2f AD = tank_coords[3] - tank_coords[0];
+    sf::Vector2f AP = bullet_coords - tank_coords[0];
+
+    float dotAB = dot(AP, AB);
+    float dotAD = dot(AP, AD);
+
+    float lenAB = dot(AB, AB);
+    float lenAD = dot(AD, AD);
+
+    bool inside = dotAB >= 0 && dotAB <= lenAB && dotAD >= 0 && dotAD <= lenAD;
+    return inside;
+  }
+  return false;
 }
 
 void Tank::moveTank(int direction, float dt) 
@@ -96,33 +124,34 @@ void Tank::rotateTank(sf::Vector2i movement_x, float dt)
   tank_body_1.getSprite()->setRotation(sf::degrees(tank_rotation));
 }
 
-void Tank::updateTank(float dt, sf::RenderWindow& window)
+void Tank::updateTank(float dt, sf::RenderWindow& window,sf::Vector2f aim_location)
 {
   bullets.move(dt);
-  sf::Vector2f mouse_location =
-    static_cast<sf::Vector2f>(sf::Mouse::getPosition(window));
-  float desired_angle =
-    lookAt(tank_turret.getSprite()->getPosition(), mouse_location) + 90;
-  float turn_amount_left = std::remainder(turret_rotation - desired_angle, 360);
+  if (is_alive)
+  {
+    float desired_angle =
+      lookAt(tank_turret.getSprite()->getPosition(), aim_location) + 90;
+    float turn_amount_left =
+      std::remainder(turret_rotation - desired_angle, 360);
 
-  if (turn_amount_left > 180)
-  {
-    turn_amount_left = turn_amount_left - 360;
-  }
-  if (turn_amount_left < -180)
-  {
-    turn_amount_left = turn_amount_left + 360;
-  }
+    if (turn_amount_left > 180)
+    {
+      turn_amount_left = turn_amount_left - 360;
+    }
+    if (turn_amount_left < -180)
+    {
+      turn_amount_left = turn_amount_left + 360;
+    }
 
-  if (turn_amount_left < 0)
-  {
-    turret_rotation += (turret_rotation_speed*dt);
+    if (turn_amount_left < 0)
+    {
+      turret_rotation += (turret_rotation_speed * dt);
+    }
+    else
+    {
+      turret_rotation -= (turret_rotation_speed * dt);
+    }
   }
-  else
-  {
-    turret_rotation -= (turret_rotation_speed*dt);
-  }
-
 }
 
 void Tank::setPos(sf::Vector2f loc) 
@@ -135,21 +164,17 @@ sf::Vector2f Tank::getMuzzlePosition()
   return tank_turret.getSprite()->getTransform().transformPoint(muzzle_offset);
 }
 
+void Tank::death() 
+{
+  is_alive = false;
+}
+
 void Tank::drawTankMarkers(sf::RenderWindow& window)
 {
-  // Configurable marker parameters (edit these values to customize marker local
-  // position / appearance)
-  sf::Vector2f marker_local_offset = { 3.f, 2.f }; // local coordinates relative
-                                                   // to the tank body sprite
-                                                   // origin
-
-  static sf::Color marker_color = sf::Color(255, 0, 0, 200); // semi-transparent
-                                                             // red
-
-  // Compute marker world position using the sprite transform so rotation, scale
-  // and origin are accounted for
-
-  // Draw marker (centered)
+  sf::Vector2f marker_local_offset = { 3.f, 2.f };
+  static sf::Color marker_color = sf::Color(255, 0, 0, 200);
+  
+  // Marker Set Up
   sf::CircleShape marker(2.0f);
   marker.setOrigin({ 2, 2 });
   marker.setFillColor(marker_color);
@@ -162,10 +187,9 @@ void Tank::drawTankMarkers(sf::RenderWindow& window)
       bodySprite->getTransform().transformPoint(marker_local_offset);
     marker.setPosition(markerWorldPos);
     window.draw(marker);
-    std::cout << marker.getPosition().x << " , " << marker.getPosition().y << std::endl;
   }
   {
-    // Top Left
+    // Top Right
     sf::Vector2f marker_local_offset = { 30.5f, 2.f };
     sf::Sprite* bodySprite           = tank_body_1.getSprite();
     sf::Vector2f markerWorldPos =
@@ -196,7 +220,6 @@ void Tank::drawTankMarkers(sf::RenderWindow& window)
 sf::Vector2f* Tank::getTankMarkers()
 {
   static sf::Vector2f tank_markers[4];
-  // Example marker positions (replace with actual logic as needed)
   tank_markers[0] = tank_body_1.getSprite()->getTransform().transformPoint({ 3.f, 2.f });
   tank_markers[1] = tank_body_1.getSprite()->getTransform().transformPoint({ 30.5f, 2.f });
   tank_markers[2] = tank_body_1.getSprite()->getTransform().transformPoint({ 3.f, 45.f });
@@ -210,5 +233,12 @@ void Tank::fireGun()
   bullets.fire(turret_rotation);
 
 }
+
+Bullet& Tank::getBullets()
+{
+  return bullets;
+}
+
+
 
 

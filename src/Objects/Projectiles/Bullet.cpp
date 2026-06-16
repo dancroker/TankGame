@@ -38,5 +38,10 @@ sf::Sprite Bullet::getSprite()
   return *bullet_object.getSprite();
 }
 
+void Bullet::remove() 
+{
+  hasFired = false;
+}
+
 
 

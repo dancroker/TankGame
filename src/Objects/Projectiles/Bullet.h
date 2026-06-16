@@ -6,9 +6,12 @@ class Bullet
   Bullet();
   ~Bullet();
   void setLocation(sf::Vector2i location);
+  sf::Vector2f getLocation(){return bullet_object.getSprite()->getPosition();};
   void fire(float tank_rotation);
   void move(float dt);
   sf::Sprite getSprite();
+  void remove();
+  bool gethasFired() { return hasFired; };
 
   private:
   GameObject bullet_object;

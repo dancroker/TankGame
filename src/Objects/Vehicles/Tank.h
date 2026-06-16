@@ -11,15 +11,18 @@ class Tank
   void drawTank(sf::RenderWindow& window);
   void tankControl(sf::Vector2i movement_y, float dt);
   float lookAt(sf::Vector2f from, sf::Vector2f too);
+  bool bulletCollision(sf::Vector2f tank_coords[4], sf::Vector2f bullet_coords);
   void moveTank(int direction,float dt);
   void rotateTank(sf::Vector2i movement, float dt);
-  void updateTank(float dt, sf::RenderWindow& window);
+  void updateTank(float dt, sf::RenderWindow& window, sf::Vector2f aim_location);
   void setPos(sf::Vector2f loc);
   void fireGun();
+  Bullet& getBullets();
   sf::Sprite getBodySprite() { return *tank_body_1.getSprite();  };
   float getTankRotation() { return tank_rotation; };
   void setTankRotation(float rotation) { tank_rotation = rotation; };
   sf::Vector2f getMuzzlePosition();
+  void death();
   
   void drawTankMarkers(sf::RenderWindow& window);
   sf::Vector2f* getTankMarkers();
@@ -37,4 +40,5 @@ class Tank
   float turret_rotation_speed = 120;
   sf::Vector2f muzzle_offset   = { 8.f, 0.f };
   Bullet bullets;
+  bool is_alive = true;
 };
