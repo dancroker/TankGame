@@ -1,6 +1,5 @@
 #pragma once
 #include "../GameObject.h"
-#include "../Projectiles/Bullet.h"
 class Tank
 {
 
@@ -17,12 +16,13 @@ class Tank
   void updateTank(float dt, sf::RenderWindow& window, sf::Vector2f aim_location);
   void setPos(sf::Vector2f loc);
   void fireGun();
-  Bullet& getBullets();
-  sf::Sprite getBodySprite() { return *tank_body_1.getSprite();  };
+  sf::Sprite& getBodySprite() { return *tank_body_1.getSprite();  };
   float getTankRotation() { return tank_rotation; };
   void setTankRotation(float rotation) { tank_rotation = rotation; };
   sf::Vector2f getMuzzlePosition();
   void death();
+  float getTankRotationSpeed() { return tank_rotation_speed; };
+  float getTankTurretRotationRotation() { return turret_rotation; };
   
   void drawTankMarkers(sf::RenderWindow& window);
   sf::Vector2f* getTankMarkers();
@@ -39,6 +39,5 @@ class Tank
   float tank_speed      = 100;
   float turret_rotation_speed = 120;
   sf::Vector2f muzzle_offset   = { 8.f, 0.f };
-  Bullet bullets;
   bool is_alive = true;
 };

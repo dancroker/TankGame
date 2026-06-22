@@ -10,6 +10,7 @@ class Map
 
   bool isColliding(const sf::Sprite bounds) const;
   int isTankColliding(sf::Vector2f tank_points[4]);
+  int (*getWholeMapGrid()) { return *map_grid; }
 
   // Returns true when the given world-space bounding rectangle overlaps a solid tile.
 

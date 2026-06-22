@@ -1,9 +1,6 @@
 #include "Tank.h"
 
-Tank::Tank() 
-{
-
-}
+Tank::Tank() {}
 Tank::~Tank() {}
 
 void Tank::setupTank(std::string filename_1, std::string filename_2, std::string filename_3)
@@ -22,17 +19,10 @@ void Tank::setupTank(std::string filename_1, std::string filename_2, std::string
   tank_turret.getSprite()->setOrigin(
     { tank_turret.getSprite()->getGlobalBounds().size.x/2, point});
   tank_turret.getSprite()->setScale({ scale, scale });
-
-
-  //-------------------------------------------
 }
 
 void Tank::drawTank(sf::RenderWindow& window)
 {
-  if (bullets.gethasFired())
-  {
-  window.draw(bullets.getSprite());
-  }
   if (is_alive)
   {
     // Draw body 1 and marker attached to it
@@ -42,7 +32,6 @@ void Tank::drawTank(sf::RenderWindow& window)
       window.draw(*tank_body_1.getSprite());
       position = tank_body_1.getSprite()->getPosition();
     }
-
     if (tank_body_2.getVisible())
     {
       window.draw(*tank_body_2.getSprite());
@@ -54,18 +43,6 @@ void Tank::drawTank(sf::RenderWindow& window)
       window.draw(*tank_turret.getSprite());
     }
     drawTankMarkers(window);
-  }
-}
-
-void Tank::tankControl(sf::Vector2i movement_y, float dt)
-{
-  if (movement_y.y != 0)
-  {
-    moveTank(1,dt);
-  }
-  if (movement_y.x != 0)
-  {
-    moveTank(-1,dt);
   }
 }
 
@@ -111,22 +88,8 @@ void Tank::moveTank(int direction, float dt)
   position = tank_body_1.getSprite()->getPosition();
 }
 
-void Tank::rotateTank(sf::Vector2i movement_x, float dt) 
-{
-  if (movement_x.x != 0)
-  {
-    tank_rotation += tank_rotation_speed * dt;
-  }
-  if (movement_x.y != 0)
-  {
-    tank_rotation -= tank_rotation_speed * dt;
-  }
-  tank_body_1.getSprite()->setRotation(sf::degrees(tank_rotation));
-}
-
 void Tank::updateTank(float dt, sf::RenderWindow& window,sf::Vector2f aim_location)
 {
-  bullets.move(dt);
   if (is_alive)
   {
     float desired_angle =
@@ -227,18 +190,18 @@ sf::Vector2f* Tank::getTankMarkers()
   return tank_markers;
 }
 
-void Tank::fireGun() 
+void Tank::rotateTank(sf::Vector2i movement_x, float dt)
 {
-  bullets.setLocation(static_cast<sf::Vector2i>(getMuzzlePosition()));
-  bullets.fire(turret_rotation);
-
+  if (movement_x.x != 0)
+  {
+    setTankRotation(
+      getTankRotation() + getTankRotationSpeed() * dt);
+  }
+  if (movement_x.y != 0)
+  {
+    setTankRotation(
+      getTankRotation() -   getTankRotationSpeed() * dt);
+  }
+  getBodySprite().setRotation(sf::degrees(getTankRotation()));
 }
-
-Bullet& Tank::getBullets()
-{
-  return bullets;
-}
-
-
-
 

@@ -1,5 +1,7 @@
 #pragma once
 #include "Objects/Vehicles/Tank.h"
+#include "Objects/Vehicles/Player/Player.h"
+#include "Objects/Vehicles/Enemy/EnemyBase.h"
 #include "Maps/Map.h"
 class Game
 {
@@ -13,9 +15,9 @@ class Game
   void keyReleased(const sf::Event::KeyReleased& key);
 
  private:
-  Tank tank;
+  Player player;
   Map map;
-  Tank tankt;
+  EnemyBase enemy;
   sf::Vector2i movement_y = { 0, 0 };
   sf::Vector2i movement_x = { 0, 0 };
 };
