@@ -29,3 +29,23 @@ void EnemyBase::update(float dt, sf::RenderWindow& window, sf::Vector2f aim_loca
     bullet.move(dt);
   }
 }
+
+void EnemyBase::move() 
+{
+  std::list<sf::Vector2i> visited;
+  std::list<sf::Vector2i> path;
+  bfs(visited, path, { 400, 400 }, { 200, 200 });
+
+
+
+}
+
+void EnemyBase::bfs(std::list<sf::Vector2i> visited, std::list<sf::Vector2i> path, sf::Vector2i start, sf::Vector2i goal)
+{
+  visited.push_back(start);
+  path.push_back(start);
+
+  while (!path.empty())
+  {
+  }
+}

@@ -20,7 +20,7 @@ int main()
 
 			if (const auto* key = event->getIf<sf::Event::KeyPressed>())
             {
-              game.keyPressed(*key);
+              game.keyPressed(*key, window);
             }
             if (const auto* key = event->getIf<sf::Event::KeyReleased>())
             {

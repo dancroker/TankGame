@@ -11,9 +11,15 @@ FetchContent_Declare(SFML
     EXCLUDE_FROM_ALL
     SYSTEM)
 FetchContent_MakeAvailable(SFML)
-add_executable(main src/main.cpp "src/Objects/Vehicles/Tank.h" "src/Objects/Vehicles/Tank.cpp" "src/Objects/GameObject.h" "src/Objects/GameObject.cpp" "src/Game.h" "src/Game.cpp"   "src/Objects/Projectiles/Bullet.h" "src/Objects/Projectiles/Bullet.cpp" "src/Maps/Map.h" "src/Maps/Map.cpp"  "src/Objects/Vehicles/Player/Player.h" "src/Objects/Vehicles/Player/Player.cpp" "src/Objects/Vehicles/Enemy/EnemyBase.h" "src/Objects/Vehicles/Enemy/EnemyBase.cpp")
+add_executable(main src/main.cpp "src/Objects/Vehicles/Tank.h" "src/Objects/Vehicles/Tank.cpp" "src/Objects/GameObject.h" "src/Objects/GameObject.cpp" "src/Game.h" "src/Game.cpp"   "src/Objects/Projectiles/Bullet.h" "src/Objects/Projectiles/Bullet.cpp" "src/Maps/Map.h" "src/Maps/Map.cpp"  "src/Objects/Vehicles/Player/Player.h" "src/Objects/Vehicles/Player/Player.cpp" "src/Objects/Vehicles/Enemy/EnemyBase.h" "src/Objects/Vehicles/Enemy/EnemyBase.cpp" "src/Screens/ScreenBase.h" "src/Screens/ScreenBase.cpp" "src/Screens/MainMenu.h" "src/Screens/MainMenu.cpp" "src/Screens/ControlMenu.h" "src/Screens/ControlMenu.cpp")
 target_compile_features(main PRIVATE cxx_std_17)
 target_link_libraries(main PRIVATE SFML::Graphics SFML::Audio)
+
+add_custom_command(TARGET main POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+    ${CMAKE_SOURCE_DIR}/assets
+    $<TARGET_FILE_DIR:main>/assets
+)
 
 
 set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT main)
