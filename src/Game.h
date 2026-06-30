@@ -35,5 +35,5 @@ class Game
 	GameOver,
 	Controls
   };
-  GameState game_state = Controls;
+  GameState game_state = MainMenu;
 };

@@ -28,7 +28,7 @@ void Map::drawMap(sf::RenderWindow& window)
     }
 }
 
-bool Map::isColliding(const sf::Sprite bounds) const
+bool Map::isBulletColliding(const sf::Vector2f location) const
 {
   for (int x = 0; x < 11; x++)
   {
@@ -37,7 +37,7 @@ bool Map::isColliding(const sf::Sprite bounds) const
           if (map_grid[y][x] == 1)
           {
             sf::FloatRect tile_rect({x * tile_size, y * tile_size}, {tile_size, tile_size});
-            if (tile_rect.contains(bounds.getPosition()))
+            if (tile_rect.contains(location))
               {
                   return true;
               }

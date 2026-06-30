@@ -26,7 +26,7 @@ void EnemyBase::update(float dt, sf::RenderWindow& window, sf::Vector2f aim_loca
   tank.updateTank(dt, window, aim_location);
   if (bullet.gethasFired())
   {
-    bullet.move(dt);
+    bullet.move(dt,window);
   }
 }
 

@@ -8,7 +8,7 @@ class Map
   ~Map();
   void drawMap(sf::RenderWindow& window);
 
-  bool isColliding(const sf::Sprite bounds) const;
+  bool isBulletColliding(const sf::Vector2f location) const;
   int isTankColliding(sf::Vector2f tank_points[4]);
   int (*getWholeMapGrid()) { return *map_grid; }
 

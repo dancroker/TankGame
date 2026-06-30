@@ -20,15 +20,6 @@ void Player::movePlayer(
 
 void Player::rotate(sf::Vector2i movement_x, float dt)
 {
-  /*if (movement_x.x != 0)
-  {
-    player_tank.setTankRotation(player_tank.getTankRotation() + player_tank.getTankRotationSpeed() * dt);
-  }
-  if (movement_x.y != 0)
-  {
-    player_tank.setTankRotation(player_tank.getTankRotation() - player_tank.getTankRotationSpeed() * dt);
-  }
-  player_tank.getBodySprite().setRotation(sf::degrees(player_tank.getTankRotation()));*/
   player_tank.rotateTank(movement_x, dt);
 }
 
@@ -48,7 +39,7 @@ void Player::update(float dt, sf::RenderWindow& window, sf::Vector2f aim_locatio
   player_tank.updateTank(dt, window, aim_location);
   if (bullet.gethasFired())
   {
-    bullet.move(dt);
+    bullet.move(dt,window);
   }
 }
 void Player::draw(sf::RenderWindow& window) 
@@ -57,11 +48,21 @@ void Player::draw(sf::RenderWindow& window)
         {
         window.draw(bullet.getSprite());
         }
+        
     player_tank.drawTank(window);
 }
 
 void Player::fireGun()
 {
-  bullet.setLocation(static_cast<sf::Vector2i>(player_tank.getMuzzlePosition()));
-  bullet.fire(player_tank.getTankTurretRotationRotation());
+  bullet.fire(player_tank.getTankTurretRotationRotation(), player_tank.getMuzzlePosition());
+}
+
+sf::Vector2f Player::getBulletLocation() 
+{
+  bullet.getSprite().setOrigin({ bullet.getSprite().getGlobalBounds().size.x / 2,
+                                 bullet.getSprite().getGlobalBounds().size.y / 2});
+
+  sf::Vector2f bullet_location = bullet.getSprite().getPosition();
+  bullet.getSprite().setOrigin({ 0, 0 });
+  return bullet_location;
 }

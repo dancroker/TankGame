@@ -143,6 +143,11 @@ void Game::updatePlaying(float dt, sf::RenderWindow& window)
     player.bulletRemove();
   }
 
+  if (map.isBulletColliding(player.getBulletLocation()))
+  {
+    player.bulletHitWall(window);
+  }
+
   sf::Vector2i true_movement = movement_y;
   if (collision != -1)
   {

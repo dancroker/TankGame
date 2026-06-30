@@ -13,8 +13,9 @@ class Player
   void draw(sf::RenderWindow& window);
   void update(float dt, sf::RenderWindow& window, sf::Vector2f aim_location);
   void fireGun();
-  sf::Vector2f getBulletLocation() { return bullet.getLocation(); };
+  sf::Vector2f getBulletLocation();
   void bulletRemove() { bullet.remove(); };
+  void bulletHitWall(sf::RenderWindow& window) { bullet.hitWall(window, getBulletLocation()); };
 
  private:
   Tank player_tank;
